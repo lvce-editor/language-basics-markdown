@@ -1,0 +1,12 @@
+{
+  "id": "builtin.language-basics-markdown",
+  "name": "Language Basics Markdown",
+  "description": "Provides syntax highlighting and bracket matching in Markdown files.",
+  "languages": [
+    {
+      "id": "markdown",
+      "extensions": [".md"],
+      "tokenize": "src/tokenizeMarkdown.js"
+    }
+  ]
+}
