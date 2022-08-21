@@ -36,6 +36,7 @@ export const TokenType = {
   Error: 141,
   PunctuationString: 11,
   NewLine: 891,
+  Heading: 13,
 }
 
 export const TokenMap = {
@@ -51,6 +52,7 @@ export const TokenMap = {
   [TokenType.Punctuation]: 'Punctuation',
   [TokenType.Error]: 'Error',
   [TokenType.PunctuationString]: 'PunctuationString',
+  [TokenType.Heading]: 'Heading',
 }
 
 const RE_ANGLE_BRACKET_CLOSE = /^>/
@@ -83,6 +85,7 @@ const RE_TAGNAME = /^[!\w]+/
 const RE_TEXT = /^[^<>\n]+/
 const RE_WHITESPACE = /^\s+/
 const RE_WORD = /^[^\s]+/
+const RE_HEADING = /^\#.*/s
 
 export const initialLineState = {
   state: State.TopLevelContent,
@@ -120,6 +123,8 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_ANGLE_BRACKET_OPEN_TAG))) {
           token = TokenType.PunctuationTag
           state = State.AfterOpeningAngleBracket
+        } else if ((next = part.match(RE_HEADING))) {
+          token = TokenType.Heading
         } else if ((next = part.match(RE_TEXT))) {
           token = TokenType.Text
           state = State.TopLevelContent
