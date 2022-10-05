@@ -15,6 +15,8 @@ const State = {
   None: 11,
   InsideDoubleQuoteString: 12,
   InsideSingleQuoteString: 13,
+  AfterTripleBackTick: 14,
+  AfterTripleBackTickAfterLanguageId: 15,
 }
 
 export const StateMap = {}
@@ -86,6 +88,8 @@ const RE_TEXT = /^[^<>\n]+/
 const RE_WHITESPACE = /^\s+/
 const RE_WORD = /^[^\s]+/
 const RE_HEADING = /^\#.*/s
+const RE_TRIPLE_BACKTICK = /^`{3,}/
+const RE_TRIPLE_QUOTED_STRING_CONTENT = /.*/s
 
 export const initialLineState = {
   state: State.TopLevelContent,
@@ -100,6 +104,8 @@ export const initialLineState = {
 export const isLineStateEqual = (lineStateA, lineStateB) => {
   return lineStateA.state === lineStateB.state
 }
+
+export const hasArrayReturn = true
 
 /**
  *
@@ -125,6 +131,9 @@ export const tokenizeLine = (line, lineState) => {
           state = State.AfterOpeningAngleBracket
         } else if ((next = part.match(RE_HEADING))) {
           token = TokenType.Heading
+        } else if ((next = part.match(RE_TRIPLE_BACKTICK))) {
+          token = TokenType.PunctuationString
+          state = State.AfterTripleBackTick
         } else if ((next = part.match(RE_TEXT))) {
           token = TokenType.Text
           state = State.TopLevelContent
@@ -136,6 +145,7 @@ export const tokenizeLine = (line, lineState) => {
           state = State.TopLevelContent
         } else {
           part //?
+          console.log({ part })
           throw new Error('no')
         }
         break
@@ -291,15 +301,32 @@ export const tokenizeLine = (line, lineState) => {
           throw new Error('no')
         }
         break
+      case State.AfterTripleBackTick:
+        if ((next = part.match(RE_WORD))) {
+          token = TokenType.String
+          state = State.AfterTripleBackTickAfterLanguageId
+        } else {
+          throw new Error('no')
+        }
+        break
+      case State.AfterTripleBackTickAfterLanguageId:
+        if ((next = part.match(RE_TRIPLE_BACKTICK))) {
+          token = TokenType.PunctuationString
+          state = State.TopLevelContent
+        } else if ((next = part.match(RE_TRIPLE_QUOTED_STRING_CONTENT))) {
+          token = TokenType.String
+          state = State.AfterTripleBackTickAfterLanguageId
+        } else {
+          throw new Error('no')
+        }
+        break
       default:
         state
         throw new Error('no')
     }
-    index += next[0].length
-    tokens.push({
-      type: token,
-      length: next[0].length,
-    })
+    const tokenLength = next[0].length
+    index += tokenLength
+    tokens.push(token, tokenLength)
   }
   return {
     state,
