@@ -136,6 +136,7 @@ export const tokenizeLine = (line, lineState) => {
           state = State.TopLevelContent
         } else {
           part //?
+          console.log({ part })
           throw new Error('no')
         }
         break
@@ -306,3 +307,5 @@ export const tokenizeLine = (line, lineState) => {
     tokens,
   }
 }
+
+tokenizeLine(`\`\`\``, initialLineState) //?
