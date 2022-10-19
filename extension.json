@@ -5,7 +5,7 @@
   "languages": [
     {
       "id": "markdown",
-      "extensions": [".md"],
+      "extensions": [".md", ".markdown"],
       "tokenize": "src/tokenizeMarkdown.js"
     }
   ]
