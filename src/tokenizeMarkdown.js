@@ -305,6 +305,9 @@ export const tokenizeLine = (line, lineState) => {
         if ((next = part.match(RE_WORD))) {
           token = TokenType.String
           state = State.AfterTripleBackTickAfterLanguageId
+        } else if ((next = part.match(RE_WHITESPACE))) {
+          token = TokenType.Whitespace
+          state = State.AfterTripleBackTick
         } else {
           throw new Error('no')
         }
