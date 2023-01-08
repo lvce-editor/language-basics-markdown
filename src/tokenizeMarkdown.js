@@ -17,6 +17,7 @@ const State = {
   InsideSingleQuoteString: 13,
   AfterTripleBackTick: 14,
   AfterTripleBackTickAfterLanguageId: 15,
+  InsideBackTickString: 16,
 }
 
 export const StateMap = {}
@@ -39,6 +40,7 @@ export const TokenType = {
   PunctuationString: 11,
   NewLine: 891,
   Heading: 13,
+  MarkdownString: 18,
 }
 
 export const TokenMap = {
@@ -55,6 +57,7 @@ export const TokenMap = {
   [TokenType.Error]: 'Error',
   [TokenType.PunctuationString]: 'PunctuationString',
   [TokenType.Heading]: 'Heading',
+  [TokenType.MarkdownString]: 'MarkdownString',
 }
 
 const RE_ANGLE_BRACKET_CLOSE = /^>/
@@ -79,17 +82,20 @@ const RE_PUNCTUATION = /^[<;'".,]/
 const RE_PUNCTUATION_SELF_CLOSING = /^\/>/
 const RE_SELF_CLOSING = /^\/>/
 const RE_SINGLE_QUOTE = /^'/
+const RE_QUOTE_BACKTICK = /^`/
 const RE_SLASH = /^\//
+const RE_STRING_BACKTICK_QUOTE_CONTENT = /^[^`]+/
 const RE_STRING_DOUBLE_QUOTE_CONTENT = /^[^"]+/
 const RE_STRING_SINGLE_QUOTE_CONTENT = /^[^']+/
 const RE_TAG_TEXT = /^[^\s>]+/
 const RE_TAGNAME = /^[!\w]+/
-const RE_TEXT = /^[^<>\n]+/
+const RE_TEXT = /^[^<>\n\`]+/
 const RE_WHITESPACE = /^\s+/
 const RE_WORD = /^[^\s]+/
 const RE_HEADING = /^\#.*/s
 const RE_TRIPLE_BACKTICK = /^`{3,}/
 const RE_TRIPLE_QUOTED_STRING_CONTENT = /.*/s
+const RE_STRING_ESCAPE = /^\\./
 
 export const initialLineState = {
   state: State.TopLevelContent,
@@ -137,6 +143,9 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_TEXT))) {
           token = TokenType.Text
           state = State.TopLevelContent
+        } else if ((next = part.match(RE_QUOTE_BACKTICK))) {
+          token = TokenType.Punctuation
+          state = State.InsideBackTickString
         } else if ((next = part.match(RE_ANGLE_BRACKET_CLOSE))) {
           token = TokenType.Text
           state = State.TopLevelContent
@@ -319,6 +328,20 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_TRIPLE_QUOTED_STRING_CONTENT))) {
           token = TokenType.String
           state = State.AfterTripleBackTickAfterLanguageId
+        } else {
+          throw new Error('no')
+        }
+        break
+      case State.InsideBackTickString:
+        if ((next = part.match(RE_QUOTE_BACKTICK))) {
+          token = TokenType.Punctuation
+          state = State.TopLevelContent
+        } else if ((next = part.match(RE_STRING_BACKTICK_QUOTE_CONTENT))) {
+          token = TokenType.MarkdownString
+          state = State.InsideBackTickString
+        } else if ((next = part.match(RE_STRING_ESCAPE))) {
+          token = TokenType.String
+          state = State.InsideBackTickString
         } else {
           throw new Error('no')
         }
