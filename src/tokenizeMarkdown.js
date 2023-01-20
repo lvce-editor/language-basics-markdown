@@ -94,7 +94,7 @@ const RE_WHITESPACE = /^\s+/
 const RE_WORD = /^[^\s]+/
 const RE_HEADING = /^\#.*/s
 const RE_TRIPLE_BACKTICK = /^`{3,}/
-const RE_TRIPLE_QUOTED_STRING_CONTENT = /.*/s
+const RE_TRIPLE_QUOTED_STRING_CONTENT = /[^`]/s
 const RE_STRING_ESCAPE = /^\\./
 
 export const initialLineState = {
