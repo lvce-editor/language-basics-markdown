@@ -41,6 +41,8 @@ export const TokenType = {
   NewLine: 891,
   Heading: 13,
   MarkdownString: 18,
+  MarkdownLinkName: 19,
+  MarkdownLinkUrl: 20,
 }
 
 export const TokenMap = {
@@ -58,6 +60,8 @@ export const TokenMap = {
   [TokenType.PunctuationString]: 'PunctuationString',
   [TokenType.Heading]: 'Heading',
   [TokenType.MarkdownString]: 'MarkdownString',
+  [TokenType.MarkdownLinkName]: 'MarkdownLinkName',
+  [TokenType.MarkdownLinkUrl]: 'MarkdownLinkUrl',
 }
 
 const RE_ANGLE_BRACKET_CLOSE = /^>/
@@ -89,13 +93,15 @@ const RE_STRING_DOUBLE_QUOTE_CONTENT = /^[^"]+/
 const RE_STRING_SINGLE_QUOTE_CONTENT = /^[^']+/
 const RE_TAG_TEXT = /^[^\s>]+/
 const RE_TAGNAME = /^[!\w]+/
-const RE_TEXT = /^[^<>\n\`]+/
+const RE_TEXT = /^[^<>\n\`\[\]]+/
 const RE_WHITESPACE = /^\s+/
 const RE_WORD = /^[^\s]+/
 const RE_HEADING = /^\#.*/s
 const RE_TRIPLE_BACKTICK = /^`{3,}/
 const RE_TRIPLE_QUOTED_STRING_CONTENT = /[^`]/s
 const RE_STRING_ESCAPE = /^\\./
+const RE_LINK = /^\[([^\[\]\\]+?)\]\((.*)\)/
+const RE_ANYTHING_UNTIL_END = /^.+/s
 
 export const initialLineState = {
   state: State.TopLevelContent,
@@ -150,6 +156,30 @@ export const tokenizeLine = (line, lineState) => {
           token = TokenType.Text
           state = State.TopLevelContent
         } else if ((next = part.match(RE_ANGLE_BRACKET_OPEN))) {
+          token = TokenType.Text
+          state = State.TopLevelContent
+        } else if ((next = part.match(RE_LINK))) {
+          const tokenLength = next[0].length
+          index += tokenLength
+          const linkName = next[1]
+          const linkUrl = next[2]
+          tokens.push(
+            TokenType.Punctuation,
+            1,
+            TokenType.MarkdownLinkName,
+            linkName.length,
+            TokenType.Punctuation,
+            1,
+            TokenType.Punctuation,
+            1,
+            TokenType.MarkdownLinkUrl,
+            linkUrl.length,
+            TokenType.Punctuation,
+            1
+          )
+          tokens.push(token, tokenLength)
+          continue
+        } else if ((next = part.match(RE_ANYTHING_UNTIL_END))) {
           token = TokenType.Text
           state = State.TopLevelContent
         } else {
