@@ -1,0 +1,12 @@
+Text
+NewLine
+NewLine
+Text
+NewLine
+NewLine
+Text
+Punctuation
+MarkdownString
+Punctuation
+Text
+NewLine
