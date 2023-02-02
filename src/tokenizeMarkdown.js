@@ -110,7 +110,8 @@ const RE_ATTRIBUTE_VALUE_UNQUOTED = /^[^<>\s]+/
  * @returns {string}
  */
 const getEmbeddedLanguageId = (attribute) => {
-  switch (attribute) {
+  const attributeLowerCase = attribute.toLowerCase()
+  switch (attributeLowerCase) {
     case 'js':
       return 'javascript'
     case 'shell':
@@ -120,12 +121,12 @@ const getEmbeddedLanguageId = (attribute) => {
     case 'text':
       return 'plaintext'
     default:
-      if (attribute.includes(':')) {
-        const parts = attribute.split(':')
+      if (attributeLowerCase.includes(':')) {
+        const parts = attributeLowerCase.split(':')
         const firstPart = parts[0]
         return getEmbeddedLanguageId(firstPart)
       }
-      return attribute
+      return attributeLowerCase
   }
 }
 
