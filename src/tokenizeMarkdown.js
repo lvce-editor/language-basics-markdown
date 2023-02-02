@@ -102,17 +102,29 @@ const RE_TRIPLE_QUOTED_STRING_CONTENT = /[^`]+/s
 const RE_STRING_ESCAPE = /^\\./
 const RE_LINK = /^\[([^\[\]\\]+?)\]\((.*)\)/
 const RE_ANYTHING_UNTIL_END = /^.+/s
+const RE_ATTRIBUTE_VALUE_UNQUOTED = /^[^<>\s]+/
 
 /**
  *
  * @param {string} attribute
- * @returns
+ * @returns {string}
  */
 const getEmbeddedLanguageId = (attribute) => {
   switch (attribute) {
     case 'js':
       return 'javascript'
+    case 'shell':
+      return 'shellscript'
+    case 'md':
+      return 'markdown'
+    case 'text':
+      return 'plaintext'
     default:
+      if (attribute.includes(':')) {
+        const parts = attribute.split(':')
+        const firstPart = parts[0]
+        return getEmbeddedLanguageId(firstPart)
+      }
       return attribute
   }
 }
@@ -323,6 +335,9 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_ANGLE_BRACKET_CLOSE))) {
           token = TokenType.PunctuationTag
           state = State.TopLevelContent
+        } else if ((next = part.match(RE_ATTRIBUTE_VALUE_UNQUOTED))) {
+          token = TokenType.String
+          state = State.InsideOpeningTag
         } else {
           throw new Error('no')
         }
