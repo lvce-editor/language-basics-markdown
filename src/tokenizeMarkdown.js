@@ -398,11 +398,12 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_TRIPLE_QUOTED_STRING_CONTENT))) {
           token = TokenType.String
           state = State.AfterTripleBackTickAfterLanguageId
-          embeddedLanguageStart = index
+          embeddedLanguageStart = Math.min(embeddedLanguageStart, index)
           embeddedLanguageEnd = index + next[0].length
         } else if ((next = part.match(RE_QUOTE_BACKTICK))) {
           token = TokenType.Text
           state = State.AfterTripleBackTickAfterLanguageId
+          embeddedLanguageEnd = index + next[0].length
         } else {
           part
           throw new Error('no')
