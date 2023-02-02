@@ -115,6 +115,8 @@ const getEmbeddedLanguageId = (attribute) => {
     case 'js':
       return 'javascript'
     case 'shell':
+    case 'sh':
+    case 'bash':
       return 'shellscript'
     case 'md':
       return 'markdown'
