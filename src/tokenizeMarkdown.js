@@ -103,8 +103,25 @@ const RE_STRING_ESCAPE = /^\\./
 const RE_LINK = /^\[([^\[\]\\]+?)\]\((.*)\)/
 const RE_ANYTHING_UNTIL_END = /^.+/s
 
+/**
+ *
+ * @param {string} attribute
+ * @returns
+ */
+const getEmbeddedLanguageId = (attribute) => {
+  switch (attribute) {
+    case 'js':
+      return 'javascript'
+    default:
+      return attribute
+  }
+}
+
 export const initialLineState = {
   state: State.TopLevelContent,
+  embeddedLanguage: '',
+  embeddedLanguageStart: 0,
+  embeddedLanguageEnd: 0,
 }
 
 /**
@@ -131,6 +148,9 @@ export const tokenizeLine = (line, lineState) => {
   let tokens = []
   let token = TokenType.None
   let state = lineState.state
+  let embeddedLanguage = lineState.embeddedLanguage
+  let embeddedLanguageStart = lineState.embeddedLanguageStart
+  let embeddedLanguageEnd = lineState.embeddedLanguageEnd
   while (index < line.length) {
     const part = line.slice(index)
     switch (state) {
@@ -344,6 +364,8 @@ export const tokenizeLine = (line, lineState) => {
         if ((next = part.match(RE_WORD))) {
           token = TokenType.String
           state = State.AfterTripleBackTickAfterLanguageId
+          embeddedLanguage = getEmbeddedLanguageId(next[0])
+          embeddedLanguageStart = index + next[0].length
         } else if ((next = part.match(RE_WHITESPACE))) {
           token = TokenType.Whitespace
           state = State.AfterTripleBackTick
@@ -355,9 +377,14 @@ export const tokenizeLine = (line, lineState) => {
         if ((next = part.match(RE_TRIPLE_BACKTICK))) {
           token = TokenType.PunctuationString
           state = State.TopLevelContent
+          embeddedLanguage = ''
+          embeddedLanguageStart = 0
+          embeddedLanguageEnd = 0
         } else if ((next = part.match(RE_TRIPLE_QUOTED_STRING_CONTENT))) {
           token = TokenType.String
           state = State.AfterTripleBackTickAfterLanguageId
+          embeddedLanguageStart = index
+          embeddedLanguageEnd = index + next[0].length
         } else if ((next = part.match(RE_QUOTE_BACKTICK))) {
           token = TokenType.Text
           state = State.AfterTripleBackTickAfterLanguageId
@@ -391,5 +418,8 @@ export const tokenizeLine = (line, lineState) => {
   return {
     state,
     tokens,
+    embeddedLanguage,
+    embeddedLanguageStart,
+    embeddedLanguageEnd,
   }
 }
