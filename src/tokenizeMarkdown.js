@@ -114,6 +114,8 @@ const getEmbeddedLanguageId = (attribute) => {
   switch (attributeLowerCase) {
     case 'js':
       return 'javascript'
+    case 'ts':
+      return 'typescript'
     case 'shell':
     case 'sh':
     case 'bash':
