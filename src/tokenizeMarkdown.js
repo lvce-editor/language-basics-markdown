@@ -18,6 +18,7 @@ const State = {
   AfterTripleBackTick: 14,
   AfterTripleBackTickAfterLanguageId: 15,
   InsideBackTickString: 16,
+  AfterTripleDash: 17,
 }
 
 export const StateMap = {}
@@ -103,6 +104,7 @@ const RE_STRING_ESCAPE = /^\\./
 const RE_LINK = /^\[([^\[\]\\]+?)\]\((.*)\)/
 const RE_ANYTHING_UNTIL_END = /^.+/s
 const RE_ATTRIBUTE_VALUE_UNQUOTED = /^[^<>\s]+/
+const RE_TRIPLE_DASH = /^---/
 
 /**
  *
@@ -183,6 +185,9 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_TRIPLE_BACKTICK))) {
           token = TokenType.PunctuationString
           state = State.AfterTripleBackTick
+        } else if ((next = part.match(RE_TRIPLE_DASH))) {
+          token = TokenType.Punctuation
+          state = State.AfterTripleDash
         } else if ((next = part.match(RE_TEXT))) {
           token = TokenType.Text
           state = State.TopLevelContent
@@ -212,7 +217,7 @@ export const tokenizeLine = (line, lineState) => {
             TokenType.MarkdownLinkUrl,
             linkUrl.length,
             TokenType.Punctuation,
-            1
+            1,
           )
           tokens.push(token, tokenLength)
           continue
@@ -389,6 +394,26 @@ export const tokenizeLine = (line, lineState) => {
         } else if ((next = part.match(RE_WHITESPACE))) {
           token = TokenType.Whitespace
           state = State.AfterTripleBackTick
+        } else {
+          throw new Error('no')
+        }
+        break
+      case State.AfterTripleDash:
+        if ((next = part.match(RE_TRIPLE_DASH))) {
+          token = TokenType.Punctuation
+          state = State.TopLevelContent
+          embeddedLanguage = ''
+          embeddedLanguageStart = 0
+          embeddedLanguageEnd = 0
+        } else if ((next = part.match(RE_TEXT))) {
+          token = TokenType.String
+          state = State.AfterTripleDash
+          embeddedLanguage = 'yaml'
+          embeddedLanguageStart = index
+          embeddedLanguageEnd = index + next[0].length
+        } else if ((next = part.match(RE_WHITESPACE))) {
+          token = TokenType.Whitespace
+          state = State.AfterTripleDash
         } else {
           throw new Error('no')
         }

@@ -1,10 +1,10 @@
-Text
+Punctuation
 NewLine
-Text
+String
 NewLine
-Text
+String
 NewLine
-Text
+Punctuation
 NewLine
 NewLine
 Heading
