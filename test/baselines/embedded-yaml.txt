@@ -1,5 +1,5 @@
-Text
+Punctuation
 NewLine
-Text
+String
 NewLine
-Text
+Punctuation
