@@ -5,8 +5,12 @@
   "languages": [
     {
       "id": "markdown",
-      "extensions": [".md", ".markdown"],
+      "extensions": [
+        ".md",
+        ".markdown"
+      ],
       "tokenize": "src/tokenizeMarkdown.js"
     }
-  ]
+  ],
+  "repository": "https://github.com/lvce-editor/language-basics-markdown"
 }
