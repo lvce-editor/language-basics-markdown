@@ -1,5 +1,12 @@
 Text
-PunctuationTag
-TagName
+Punctuation
+MarkdownLinkUrl
+Punctuation
+NewLine
+NewLine
 Text
-PunctuationTag
+Punctuation
+MarkdownLinkUrl
+Punctuation
+Text
+NewLine
