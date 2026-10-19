@@ -68,7 +68,7 @@ export const TokenMap = {
 const RE_ANGLE_BRACKET_CLOSE = /^>/
 const RE_ANGLE_BRACKET_ONLY = /^</
 const RE_ANGLE_BRACKET_OPEN = /^</
-const RE_ANGLE_BRACKET_OPEN_TAG = /^<(?!\s)/
+const RE_ANGLE_BRACKET_OPEN_TAG = /^<(?!\s)(?=[a-zA-Z!]|\/[a-zA-Z])/
 const RE_AUTOLINK = /^<([a-zA-Z][a-zA-Z\d+.-]{1,31}:[^<>\s]*)>/
 const RE_ANY_TEXT = /^[^\n]+/
 const RE_ATTRIBUTE_NAME = /^[a-zA-Z\d\-]+/
@@ -94,7 +94,7 @@ const RE_STRING_BACKTICK_QUOTE_CONTENT = /^[^`]+/
 const RE_STRING_DOUBLE_QUOTE_CONTENT = /^[^"]+/
 const RE_STRING_SINGLE_QUOTE_CONTENT = /^[^']+/
 const RE_TAG_TEXT = /^[^\s>]+/
-const RE_TAGNAME = /^[!\w]+/
+const RE_TAGNAME = /^[a-zA-Z!][\w]*/
 const RE_TEXT = /^[^<>\n\`\[\]]+/
 const RE_WHITESPACE = /^\s+/
 const RE_WORD = /^[^\s]+/
